@@ -1,0 +1,26 @@
+{
+  "name": "documind-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered PDF document summarization and chat SaaS.",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "dev:client": "npm run dev --workspace client",
+    "dev:server": "npm run dev --workspace server",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspace server",
+    "build": "npm run build --workspaces",
+    "check": "npm run lint && npm run test && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+
