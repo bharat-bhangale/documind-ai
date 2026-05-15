@@ -2,7 +2,7 @@
 
 DocuMind AI is an AI-powered PDF document application with document upload, summarization, streaming document chat, authentication, Razorpay payments, and production deployment workflows.
 
-The project is currently in foundation implementation. See:
+The project currently includes backend foundation, authentication, document management, AI summary/chat, and Razorpay payment APIs. See:
 
 - `docs/01_FEATURES.md` for the feature roadmap.
 - `docs/02_TECH_STACK.md` for the selected stack.
@@ -19,6 +19,8 @@ npm run dev
 Before starting the server, replace placeholder values in `.env`.
 
 For Google login, set `GOOGLE_CLIENT_ID` to the OAuth client ID used by your frontend Google sign-in button.
+
+For Razorpay test mode, set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `PRO_PLAN_PRICE_PAISE`, and `PRO_PLAN_CURRENCY`. The payment amount is controlled only by the server.
 
 ## Workspace Scripts
 
@@ -49,3 +51,7 @@ npm run check        # lint, test, and build
 - `POST /api/ai/documents/:documentId/summary`
 - `POST /api/ai/documents/:documentId/chat`
 - `GET /api/ai/documents/:documentId/messages`
+- `POST /api/payments/orders`
+- `POST /api/payments/verify`
+- `POST /api/payments/webhook`
+- `GET /api/payments/history`

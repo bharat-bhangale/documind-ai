@@ -25,3 +25,8 @@ This file tracks decisions that future AI sessions should treat as source-of-tru
 - Store chat history as owner-scoped `ChatMessage` records and send only the latest configured messages to the model.
 - Use Server-Sent Events for AI streaming chat.
 - Use Razorpay test mode until production deployment is intentionally configured.
+- Create Razorpay payment orders server-side with `PRO_PLAN_PRICE_PAISE` and `PRO_PLAN_CURRENCY`; never trust plan amount or currency from the client.
+- Verify Checkout success callbacks server-side with HMAC-SHA256 using `order_id|payment_id` and `RAZORPAY_KEY_SECRET`.
+- Mount the Razorpay webhook route before `express.json()` and parse it with `express.raw()` so signature verification uses the raw request body.
+- Process Razorpay webhooks idempotently with `x-razorpay-event-id` and only upgrade users after a verified `payment.captured` event or valid Checkout signature.
+- Store only sanitized payment metadata in MongoDB; do not persist Razorpay signatures or raw gateway payloads.
