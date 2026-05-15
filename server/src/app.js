@@ -7,6 +7,7 @@ import morgan from "morgan";
 
 import { config } from "./config/env.js";
 import { requestLogStream } from "./config/logger.js";
+import aiRoutes from "./features/ai/ai.routes.js";
 import authRoutes from "./features/auth/auth.routes.js";
 import documentRoutes from "./features/documents/document.routes.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
@@ -41,6 +42,7 @@ if (config.nodeEnv !== "test") {
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

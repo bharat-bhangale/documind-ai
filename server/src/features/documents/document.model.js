@@ -48,6 +48,13 @@ const documentSchema = new mongoose.Schema(
       type: String,
       enum: ["ready"],
       default: "ready"
+    },
+    summary: {
+      type: String,
+      default: ""
+    },
+    summaryGeneratedAt: {
+      type: Date
     }
   },
   {

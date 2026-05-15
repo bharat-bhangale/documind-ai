@@ -19,5 +19,9 @@ This file tracks decisions that future AI sessions should treat as source-of-tru
 - Store extracted PDF text and document metadata in MongoDB after upload.
 - Treat uploaded PDF files as temporary ingestion artifacts and delete them after extraction succeeds or fails.
 - Enforce Free and Pro document upload limits server-side.
-- Use Server-Sent Events for future AI streaming chat.
+- Use the OpenAI Responses API through a provider abstraction so production calls use the official SDK and tests use deterministic mocks.
+- Stream document chat over SSE, with `ready`, `chunk`, `done`, and `error` events.
+- Count AI usage server-side before model calls to prevent quota bypass and cost abuse.
+- Store chat history as owner-scoped `ChatMessage` records and send only the latest configured messages to the model.
+- Use Server-Sent Events for AI streaming chat.
 - Use Razorpay test mode until production deployment is intentionally configured.

@@ -8,6 +8,8 @@ export function serializeDocument(document, { includeText = false } = {}) {
     pageCount: document.pageCount,
     textLength: document.textLength,
     status: document.status,
+    summary: document.summary,
+    summaryGeneratedAt: document.summaryGeneratedAt,
     createdAt: document.createdAt,
     updatedAt: document.updatedAt
   };
