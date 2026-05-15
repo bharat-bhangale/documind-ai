@@ -26,7 +26,10 @@ const envSchema = Joi.object({
   LOG_LEVEL: Joi.string().valid("error", "warn", "info", "http", "debug").default("info"),
   RATE_LIMIT_WINDOW_MS: Joi.number().integer().positive().default(900000),
   RATE_LIMIT_MAX: Joi.number().integer().positive().default(100),
-  UPLOAD_DIR: Joi.string().default("uploads")
+  UPLOAD_DIR: Joi.string().default("uploads"),
+  FREE_PLAN_MAX_DOCUMENTS: Joi.number().integer().positive().default(3),
+  FREE_PLAN_MAX_FILE_SIZE_BYTES: Joi.number().integer().positive().default(5242880),
+  PRO_PLAN_MAX_FILE_SIZE_BYTES: Joi.number().integer().positive().default(10485760)
 }).unknown(true);
 
 export function validateEnv(rawEnv) {
@@ -63,6 +66,9 @@ export function validateEnv(rawEnv) {
     logLevel: value.LOG_LEVEL,
     rateLimitWindowMs: value.RATE_LIMIT_WINDOW_MS,
     rateLimitMax: value.RATE_LIMIT_MAX,
-    uploadDir: value.UPLOAD_DIR
+    uploadDir: value.UPLOAD_DIR,
+    freePlanMaxDocuments: value.FREE_PLAN_MAX_DOCUMENTS,
+    freePlanMaxFileSizeBytes: value.FREE_PLAN_MAX_FILE_SIZE_BYTES,
+    proPlanMaxFileSizeBytes: value.PRO_PLAN_MAX_FILE_SIZE_BYTES
   });
 }

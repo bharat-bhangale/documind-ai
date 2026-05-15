@@ -27,7 +27,7 @@
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "openai": "^6.9.1",
-    "pdf-parse": "^1.1.1",
+    "pdf-parse": "^2.4.5",
     "rate-limit-redis": "^4.2.3",
     "razorpay": "^2.9.6",
     "redis": "^5.10.0",
@@ -39,6 +39,7 @@
     "globals": "^16.5.0",
     "mongodb-memory-server": "^11.1.0",
     "nodemon": "^3.1.11",
+    "pdfkit": "^0.18.0",
     "supertest": "^7.1.4"
   }
 }
