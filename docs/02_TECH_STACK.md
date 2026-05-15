@@ -91,7 +91,7 @@ npm install -D tailwindcss @tailwindcss/vite
 | Technology | Purpose | Why This Choice |
 |---|---|---|
 | **multer** | File upload middleware | Standard for Express, supports file size/type limits |
-| **pdf-parse** | PDF text extraction | Lightweight, fast, simple API for digital PDFs |
+| **pdf-parse** | PDF text extraction | Maintained parser for extracting text from digital PDFs |
 
 ### Validation & Security
 
@@ -242,7 +242,7 @@ npm install razorpay
     "jsonwebtoken": "^9.x",
     "cookie-parser": "^1.4.x",
     "multer": "^1.4.x",
-    "pdf-parse": "^1.1.x",
+    "pdf-parse": "^2.x",
     "openai": "^4.x",
     "razorpay": "^2.9.x",
     "joi": "^17.x",

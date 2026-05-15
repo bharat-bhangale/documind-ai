@@ -162,3 +162,125 @@ Response:
   }
 }
 ```
+
+## Documents
+
+All document routes require `Authorization: Bearer <accessToken>`.
+
+Plan limits:
+- Free users: `FREE_PLAN_MAX_DOCUMENTS` documents and `FREE_PLAN_MAX_FILE_SIZE_BYTES` per PDF.
+- Pro users: unlimited documents and `PRO_PLAN_MAX_FILE_SIZE_BYTES` per PDF.
+
+Uploaded PDFs are temporary ingestion files. The server extracts text with `pdf-parse`, stores metadata and extracted text in MongoDB, and removes the temporary uploaded file after success or failure.
+
+### POST `/api/documents/upload`
+
+Auth: Bearer access token
+
+Content type: `multipart/form-data`
+
+Fields:
+- `file`: required PDF file.
+- `title`: optional document title.
+
+Response: `201`
+
+```json
+{
+  "success": true,
+  "data": {
+    "document": {
+      "id": "document_id",
+      "title": "Project Brief",
+      "originalName": "brief.pdf",
+      "mimeType": "application/pdf",
+      "fileSize": 12345,
+      "pageCount": 2,
+      "textLength": 2048,
+      "status": "ready",
+      "extractedText": "Extracted PDF text...",
+      "createdAt": "2026-05-15T00:00:00.000Z",
+      "updatedAt": "2026-05-15T00:00:00.000Z"
+    }
+  }
+}
+```
+
+### GET `/api/documents`
+
+Auth: Bearer access token
+
+Query:
+- `page`: default `1`.
+- `limit`: default `10`, max `50`.
+- `sortBy`: `createdAt`, `updatedAt`, `title`, or `fileSize`.
+- `sortOrder`: `asc` or `desc`.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "documents": [
+      {
+        "id": "document_id",
+        "title": "Project Brief",
+        "originalName": "brief.pdf",
+        "mimeType": "application/pdf",
+        "fileSize": 12345,
+        "pageCount": 2,
+        "textLength": 2048,
+        "status": "ready"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 1,
+      "totalPages": 1
+    }
+  }
+}
+```
+
+List responses intentionally omit `extractedText`.
+
+### GET `/api/documents/:documentId`
+
+Auth: Bearer access token
+
+Ownership: only the owner can read the document.
+
+Response: same document shape as upload, including `extractedText`.
+
+### PATCH `/api/documents/:documentId`
+
+Auth: Bearer access token
+
+Ownership: only the owner can update the document.
+
+Request:
+
+```json
+{
+  "title": "Updated Project Brief"
+}
+```
+
+Response: updated document, including `extractedText`.
+
+### DELETE `/api/documents/:documentId`
+
+Auth: Bearer access token
+
+Ownership: only the owner can delete the document.
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Document deleted successfully."
+}
+```

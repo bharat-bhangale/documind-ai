@@ -41,3 +41,8 @@ npm run check        # lint, test, and build
 - `POST /api/auth/refresh`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
+- `POST /api/documents/upload`
+- `GET /api/documents`
+- `GET /api/documents/:documentId`
+- `PATCH /api/documents/:documentId`
+- `DELETE /api/documents/:documentId`

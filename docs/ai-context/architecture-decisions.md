@@ -16,5 +16,8 @@ This file tracks decisions that future AI sessions should treat as source-of-tru
 - Store only SHA-256 hashes of refresh tokens in MongoDB.
 - Rotate refresh tokens on every refresh request and revoke all stored refresh tokens when reuse is detected.
 - Support Google login by verifying Google ID tokens server-side against `GOOGLE_CLIENT_ID`.
+- Store extracted PDF text and document metadata in MongoDB after upload.
+- Treat uploaded PDF files as temporary ingestion artifacts and delete them after extraction succeeds or fails.
+- Enforce Free and Pro document upload limits server-side.
 - Use Server-Sent Events for future AI streaming chat.
 - Use Razorpay test mode until production deployment is intentionally configured.

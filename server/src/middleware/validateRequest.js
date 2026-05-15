@@ -18,3 +18,22 @@ export function validateRequest(schema) {
   };
 }
 
+export function validateQuery(schema) {
+  return function queryValidator(req, _res, next) {
+    const { value, error } = schema.validate(req.query, {
+      abortEarly: false,
+      stripUnknown: true,
+      convert: true
+    });
+
+    if (error) {
+      const message = error.details.map((detail) => detail.message).join("; ");
+      next(new AppError(message, 400));
+      return;
+    }
+
+    req.query = value;
+    next();
+  };
+}
+
