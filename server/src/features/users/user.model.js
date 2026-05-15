@@ -21,6 +21,21 @@ const refreshTokenSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const aiUsageSchema = new mongoose.Schema(
+  {
+    dailyCount: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    lastResetAt: {
+      type: Date,
+      default: Date.now
+    }
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -66,6 +81,10 @@ const userSchema = new mongoose.Schema(
       type: [refreshTokenSchema],
       default: [],
       select: false
+    },
+    aiUsage: {
+      type: aiUsageSchema,
+      default: () => ({})
     }
   },
   {

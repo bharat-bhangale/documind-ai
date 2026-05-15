@@ -46,3 +46,6 @@ npm run check        # lint, test, and build
 - `GET /api/documents/:documentId`
 - `PATCH /api/documents/:documentId`
 - `DELETE /api/documents/:documentId`
+- `POST /api/ai/documents/:documentId/summary`
+- `POST /api/ai/documents/:documentId/chat`
+- `GET /api/ai/documents/:documentId/messages`

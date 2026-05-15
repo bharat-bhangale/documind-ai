@@ -284,3 +284,130 @@ Response:
   "message": "Document deleted successfully."
 }
 ```
+
+## AI
+
+All AI routes require `Authorization: Bearer <accessToken>` and enforce document ownership before calling the AI provider.
+
+Cost and context controls:
+- Free users are limited by `AI_FREE_DAILY_QUOTA`.
+- Pro users are not quota-limited but usage is still counted.
+- Document context is truncated to `AI_MAX_DOCUMENT_CHARS`.
+- Chat history is limited to `AI_MAX_CHAT_HISTORY_MESSAGES` previous messages.
+- Summary output is capped by `AI_SUMMARY_MAX_OUTPUT_TOKENS`.
+- Chat output is capped by `AI_CHAT_MAX_OUTPUT_TOKENS`.
+
+### POST `/api/ai/documents/:documentId/summary`
+
+Auth: Bearer access token
+
+Behavior:
+- Validates the document belongs to the authenticated user.
+- Consumes one AI usage unit.
+- Sends bounded document context to OpenAI.
+- Saves the generated summary on the document.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "summary": "Concise document summary.",
+    "document": {
+      "id": "document_id",
+      "title": "Project Brief",
+      "summary": "Concise document summary.",
+      "summaryGeneratedAt": "2026-05-15T00:00:00.000Z"
+    },
+    "usage": {
+      "dailyCount": 1,
+      "dailyLimit": 10,
+      "remaining": 9
+    },
+    "context": {
+      "documentCharactersSent": 8000,
+      "documentTruncated": true,
+      "estimatedInputTokens": 2000,
+      "maxOutputTokens": 600
+    }
+  }
+}
+```
+
+### POST `/api/ai/documents/:documentId/chat`
+
+Auth: Bearer access token
+
+Content type: `application/json`
+
+Request:
+
+```json
+{
+  "message": "What are the key points?"
+}
+```
+
+Response type: `text/event-stream`
+
+Events:
+- `ready`: stream metadata, quota snapshot, and context limits.
+- `chunk`: one streamed text chunk.
+- `done`: final assistant message and usage/context metadata.
+- `error`: stream failure after SSE headers have been sent.
+
+Example stream:
+
+```text
+event: ready
+data: {"usage":{"dailyCount":2,"dailyLimit":10,"remaining":8}}
+
+event: chunk
+data: {"chunk":"The document"}
+
+event: chunk
+data: {"chunk":" explains..."}
+
+event: done
+data: {"aborted":false,"assistantMessage":{"role":"assistant","content":"The document explains..."}}
+```
+
+Behavior:
+- Uses SSE over HTTP, not WebSockets.
+- Saves the user message before streaming.
+- Saves the assistant message only after the stream completes.
+- Aborts upstream AI work when the client disconnects.
+
+### GET `/api/ai/documents/:documentId/messages`
+
+Auth: Bearer access token
+
+Query:
+- `page`: default `1`.
+- `limit`: default `20`, max `50`.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "messages": [
+      {
+        "id": "message_id",
+        "role": "user",
+        "content": "What are the key points?",
+        "estimatedTokens": 6,
+        "createdAt": "2026-05-15T00:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 1,
+      "totalPages": 1
+    }
+  }
+}
+```

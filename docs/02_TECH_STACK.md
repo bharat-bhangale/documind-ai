@@ -150,7 +150,7 @@ npm install mongoose redis rate-limit-redis
 
 | Technology | Purpose | Why This Choice |
 |---|---|---|
-| **OpenAI SDK** (`openai` npm) | AI chat completions & streaming | Official SDK, TypeScript support, streaming built-in |
+| **OpenAI SDK** (`openai` npm) | Responses API summarization and SSE chat streaming | Official SDK, TypeScript support, streaming built-in |
 | **GPT-4o-mini** model | Document Q&A and summarization | Cheapest model ($0.15/1M input tokens), fast, sufficient quality |
 
 ### Cost Estimates (GPT-4o-mini):

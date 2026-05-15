@@ -17,6 +17,11 @@ const envSchema = Joi.object({
 
   OPENAI_API_KEY: Joi.string().min(3).required(),
   AI_MODEL: Joi.string().default("gpt-4o-mini"),
+  AI_FREE_DAILY_QUOTA: Joi.number().integer().positive().default(10),
+  AI_MAX_DOCUMENT_CHARS: Joi.number().integer().min(1000).default(8000),
+  AI_MAX_CHAT_HISTORY_MESSAGES: Joi.number().integer().min(0).max(20).default(6),
+  AI_SUMMARY_MAX_OUTPUT_TOKENS: Joi.number().integer().positive().default(600),
+  AI_CHAT_MAX_OUTPUT_TOKENS: Joi.number().integer().positive().default(1000),
   GOOGLE_CLIENT_ID: Joi.string().allow("").optional().default(""),
 
   RAZORPAY_KEY_ID: Joi.string().min(3).required(),
@@ -59,6 +64,11 @@ export function validateEnv(rawEnv) {
     passwordSaltRounds: value.PASSWORD_SALT_ROUNDS,
     openaiApiKey: value.OPENAI_API_KEY,
     aiModel: value.AI_MODEL,
+    aiFreeDailyQuota: value.AI_FREE_DAILY_QUOTA,
+    aiMaxDocumentChars: value.AI_MAX_DOCUMENT_CHARS,
+    aiMaxChatHistoryMessages: value.AI_MAX_CHAT_HISTORY_MESSAGES,
+    aiSummaryMaxOutputTokens: value.AI_SUMMARY_MAX_OUTPUT_TOKENS,
+    aiChatMaxOutputTokens: value.AI_CHAT_MAX_OUTPUT_TOKENS,
     googleClientId: value.GOOGLE_CLIENT_ID,
     razorpayKeyId: value.RAZORPAY_KEY_ID,
     razorpayKeySecret: value.RAZORPAY_KEY_SECRET,

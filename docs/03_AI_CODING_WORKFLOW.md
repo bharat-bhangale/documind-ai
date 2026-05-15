@@ -259,6 +259,7 @@ Scope:
 - User quota tracking.
 - Token/cost controls.
 - Abort stream on client disconnect.
+- OpenAI Responses API provider abstraction for testable production calls.
 
 Primary Copilot workflow:
 - Use `ai-integration.agent.md`.
@@ -278,6 +279,7 @@ Validation:
 - AI usage counters increment consistently.
 - Free user quota enforcement is tested.
 - AI responses never include another user's document content.
+- Tests use a mocked provider and never call the live OpenAI API.
 
 Acceptance prompt:
 
