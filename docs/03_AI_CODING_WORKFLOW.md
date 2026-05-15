@@ -190,6 +190,7 @@ Scope:
 - HttpOnly refresh token cookie.
 - Access token verification middleware.
 - Bcrypt password hashing.
+- Login with Google
 
 Primary Copilot workflow:
 - Use `api-endpoint.prompt.md` to generate endpoint contracts before code.

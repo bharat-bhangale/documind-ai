@@ -24,6 +24,7 @@
 | F09 | Auth Middleware (Route Protection) | 🔴 Critical |
 | F10 | Logout & Token Invalidation | 🟡 High |
 | F11 | Get Current User Profile | 🟡 High |
+| F12 | Login with google oauth | 🟡 High |
 
 ### Phase 3 — Document Management (Day 2–3)
 | # | Feature | Priority |
