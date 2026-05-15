@@ -11,10 +11,13 @@ const envSchema = Joi.object({
   JWT_REFRESH_SECRET: Joi.string().min(32).required(),
   ACCESS_TOKEN_EXPIRES_IN: Joi.string().default("15m"),
   REFRESH_TOKEN_EXPIRES_IN: Joi.string().default("7d"),
+  REFRESH_COOKIE_MAX_AGE_MS: Joi.number().integer().positive().default(604800000),
   REFRESH_COOKIE_NAME: Joi.string().default("documind_refresh_token"),
+  PASSWORD_SALT_ROUNDS: Joi.number().integer().min(10).max(15).default(12),
 
   OPENAI_API_KEY: Joi.string().min(3).required(),
   AI_MODEL: Joi.string().default("gpt-4o-mini"),
+  GOOGLE_CLIENT_ID: Joi.string().allow("").optional().default(""),
 
   RAZORPAY_KEY_ID: Joi.string().min(3).required(),
   RAZORPAY_KEY_SECRET: Joi.string().min(3).required(),
@@ -48,9 +51,12 @@ export function validateEnv(rawEnv) {
     jwtRefreshSecret: value.JWT_REFRESH_SECRET,
     accessTokenExpiresIn: value.ACCESS_TOKEN_EXPIRES_IN,
     refreshTokenExpiresIn: value.REFRESH_TOKEN_EXPIRES_IN,
+    refreshCookieMaxAgeMs: value.REFRESH_COOKIE_MAX_AGE_MS,
     refreshCookieName: value.REFRESH_COOKIE_NAME,
+    passwordSaltRounds: value.PASSWORD_SALT_ROUNDS,
     openaiApiKey: value.OPENAI_API_KEY,
     aiModel: value.AI_MODEL,
+    googleClientId: value.GOOGLE_CLIENT_ID,
     razorpayKeyId: value.RAZORPAY_KEY_ID,
     razorpayKeySecret: value.RAZORPAY_KEY_SECRET,
     razorpayWebhookSecret: value.RAZORPAY_WEBHOOK_SECRET,
@@ -60,4 +66,3 @@ export function validateEnv(rawEnv) {
     uploadDir: value.UPLOAD_DIR
   });
 }
-

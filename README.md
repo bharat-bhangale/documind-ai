@@ -18,6 +18,8 @@ npm run dev
 
 Before starting the server, replace placeholder values in `.env`.
 
+For Google login, set `GOOGLE_CLIENT_ID` to the OAuth client ID used by your frontend Google sign-in button.
+
 ## Workspace Scripts
 
 ```bash
@@ -30,3 +32,12 @@ npm run build        # build/check all workspaces
 npm run check        # lint, test, and build
 ```
 
+## Implemented API
+
+- `GET /api/health`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/google`
+- `POST /api/auth/refresh`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`

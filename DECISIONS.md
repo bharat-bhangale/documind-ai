@@ -16,3 +16,10 @@ The MVP pins Express to the 4.x line to match the original project tech stack an
 
 Copilot instructions, prompts, agents, skills, and compact AI context documents live in the repository so agent behavior is repeatable across sessions.
 
+## ADR-005: Refresh Token Rotation
+
+Authentication uses short-lived JWT access tokens returned in response bodies and longer-lived refresh tokens stored only in HttpOnly cookies. The database stores SHA-256 hashes of refresh tokens, not raw refresh tokens. Every refresh request rotates the token. If a previously rotated token is reused, all stored refresh tokens for that user are revoked.
+
+## ADR-006: Google Login Verification
+
+Google login accepts a Google ID token from the frontend and verifies it server-side with `google-auth-library` against `GOOGLE_CLIENT_ID`. Only verified Google email payloads can create or link accounts.

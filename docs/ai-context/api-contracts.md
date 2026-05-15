@@ -31,3 +31,134 @@ Response:
 
 When MongoDB is not connected, `status` is `degraded` and `services.database.state` explains the connection state.
 
+## Authentication
+
+All auth responses use the shared error shape:
+
+```json
+{
+  "success": false,
+  "message": "Readable error message.",
+  "statusCode": 401
+}
+```
+
+Refresh tokens are stored in an HttpOnly cookie named by `REFRESH_COOKIE_NAME`. Access tokens are returned in the response body and must be sent as `Authorization: Bearer <accessToken>` for protected routes.
+
+### POST `/api/auth/register`
+
+Auth: none
+
+Request:
+
+```json
+{
+  "name": "Aditi Sharma",
+  "email": "aditi@example.com",
+  "password": "Password123"
+}
+```
+
+Response: `201`
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "user_id",
+      "name": "Aditi Sharma",
+      "email": "aditi@example.com",
+      "avatarUrl": "",
+      "authProvider": "local",
+      "plan": "free"
+    },
+    "accessToken": "jwt_access_token"
+  }
+}
+```
+
+### POST `/api/auth/login`
+
+Auth: none
+
+Request:
+
+```json
+{
+  "email": "aditi@example.com",
+  "password": "Password123"
+}
+```
+
+Response: `200`, same shape as register.
+
+### POST `/api/auth/google`
+
+Auth: none
+
+Request:
+
+```json
+{
+  "credential": "google_id_token"
+}
+```
+
+Behavior:
+- Verifies the Google ID token against `GOOGLE_CLIENT_ID`.
+- Requires a verified Google email.
+- Creates a new Google user or links Google identity to an existing local email.
+
+Response: `200`, same shape as login.
+
+### POST `/api/auth/refresh`
+
+Auth: HttpOnly refresh cookie
+
+Behavior:
+- Verifies refresh JWT.
+- Requires a matching hashed refresh token in the database.
+- Rotates refresh token on every use.
+- Revokes all stored refresh tokens if reuse is detected.
+
+Response: `200`, same shape as login.
+
+### POST `/api/auth/logout`
+
+Auth: optional refresh cookie
+
+Behavior:
+- Removes the active refresh token if present.
+- Clears the refresh cookie.
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Logged out successfully."
+}
+```
+
+### GET `/api/auth/me`
+
+Auth: Bearer access token
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "user_id",
+      "name": "Aditi Sharma",
+      "email": "aditi@example.com",
+      "avatarUrl": "",
+      "authProvider": "local",
+      "plan": "free"
+    }
+  }
+}
+```

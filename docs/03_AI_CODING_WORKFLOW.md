@@ -203,7 +203,7 @@ Skills:
 
 Validation:
 - Unit tests for password hashing behavior, token issue, refresh rotation, logout, and invalid token paths.
-- Integration tests for auth endpoints.
+- Integration tests for auth endpoints, including mocked Google ID-token login.
 - Verify cookies are HttpOnly, Secure in production, SameSite configured, and not accessible to client JavaScript.
 - Verify token reuse detection revokes compromised refresh tokens.
 
@@ -211,8 +211,8 @@ Acceptance prompt:
 
 ```text
 Implement F06-F11 auth only.
-Use JWT access tokens, refresh token rotation, HttpOnly refresh cookies, bcryptjs, and centralized AppError handling.
-Add tests for register, login, refresh, logout, and /me.
+Use JWT access tokens, refresh token rotation, HttpOnly refresh cookies, bcryptjs, Google ID-token verification, and centralized AppError handling.
+Add tests for register, login, Google login, refresh, logout, and /me.
 Do not implement document upload yet.
 ```
 
