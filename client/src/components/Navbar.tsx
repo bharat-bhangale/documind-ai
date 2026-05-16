@@ -4,10 +4,10 @@ import {
   LogOut,
   Menu,
   Sparkles,
-  User,
+  User as UserIcon,
   X
 } from "lucide-react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../contexts/AuthContext";
@@ -32,7 +32,7 @@ export default function Navbar() {
     setMobileMenuOpen(false);
   }
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav
@@ -197,7 +197,7 @@ export default function Navbar() {
                 onClick={closeMobile}
                 className="btn-secondary w-full justify-center py-2.5"
               >
-                <User className="h-4 w-4" />
+                <UserIcon className="h-4 w-4" />
                 Log in
               </Link>
               <Link
@@ -217,7 +217,13 @@ export default function Navbar() {
 
 /* ── Sub-components ──────────────────────── */
 
-function NavLink({ to, active, children }) {
+interface NavLinkProps {
+  to: string;
+  active: boolean;
+  children: ReactNode;
+}
+
+function NavLink({ to, active, children }: NavLinkProps) {
   return (
     <Link
       to={to}
@@ -232,7 +238,14 @@ function NavLink({ to, active, children }) {
   );
 }
 
-function MobileLink({ to, onClick, icon, children }) {
+interface MobileLinkProps {
+  to: string;
+  onClick: () => void;
+  icon: ReactNode;
+  children: ReactNode;
+}
+
+function MobileLink({ to, onClick, icon, children }: MobileLinkProps) {
   return (
     <Link
       to={to}

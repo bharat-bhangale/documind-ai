@@ -19,7 +19,7 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
@@ -38,7 +38,7 @@ export default function RegisterPage() {
     try {
       await register({ name: name.trim(), email, password });
       navigate("/dashboard", { replace: true });
-    } catch (err) {
+    } catch (err: any) {
       setError(
         err.response?.data?.message || "Registration failed. Please try again."
       );

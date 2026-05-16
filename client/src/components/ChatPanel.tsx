@@ -5,22 +5,31 @@ import Markdown from "react-markdown";
 
 import api from "../lib/api";
 
+interface ChatMessageData {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+  isStreaming?: boolean;
+}
+
+interface ChatPanelProps {
+  documentId: string;
+}
+
 /**
  * AI Chat Panel with SSE streaming support.
  *
  * Connects to POST /api/ai/documents/:id/chat via EventSource-like fetch.
  * Receives events: ready → chunk* → done | error.
- *
- * @param {Object} props
- * @param {string} props.documentId
  */
-export default function ChatPanel({ documentId }) {
-  const [messages, setMessages] = useState([]);
+export default function ChatPanel({ documentId }: ChatPanelProps) {
+  const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
-  const messagesEndRef = useRef(null);
-  const abortControllerRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   /* ── Auto-scroll to bottom on new messages ── */
   const scrollToBottom = useCallback(() => {
@@ -43,7 +52,7 @@ export default function ChatPanel({ documentId }) {
 
         if (!cancelled && data.data?.messages) {
           setMessages(
-            data.data.messages.map((msg) => ({
+            data.data.messages.map((msg: any) => ({
               id: msg.id,
               role: msg.role,
               content: msg.content,
@@ -73,13 +82,13 @@ export default function ChatPanel({ documentId }) {
   }, []);
 
   /* ── Send message and stream response via SSE ── */
-  async function handleSendMessage(e) {
+  async function handleSendMessage(e: React.FormEvent) {
     e.preventDefault();
 
     const trimmedInput = input.trim();
     if (!trimmedInput || isStreaming) return;
 
-    const userMessage = {
+    const userMessage: ChatMessageData = {
       id: `temp-user-${Date.now()}`,
       role: "user",
       content: trimmedInput,
@@ -131,6 +140,10 @@ export default function ChatPanel({ documentId }) {
         throw new Error(errorMessage);
       }
 
+      if (!response.body) {
+        throw new Error("No response body.");
+      }
+
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -168,7 +181,7 @@ export default function ChatPanel({ documentId }) {
                 throw new Error(eventData.message || "AI stream error.");
               }
               /* "ready" and "done" events don't need special handling for the UI */
-            } catch (parseError) {
+            } catch (parseError: any) {
               if (parseError.message && !parseError.message.includes("JSON")) {
                 throw parseError;
               }
@@ -176,7 +189,7 @@ export default function ChatPanel({ documentId }) {
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === "AbortError") return;
 
       toast.error(error.message || "Failed to get AI response.");
@@ -278,7 +291,7 @@ export default function ChatPanel({ documentId }) {
 
 /* ── Chat message bubble ─────────────────── */
 
-function ChatMessage({ message }) {
+function ChatMessage({ message }: { message: ChatMessageData }) {
   const isUser = message.role === "user";
 
   return (

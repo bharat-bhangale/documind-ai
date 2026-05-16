@@ -1,12 +1,7 @@
-import axios from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 /**
  * Axios instance pre-configured for the DocuMind backend.
- *
- * – Attaches the access token from localStorage on every request.
- * – On a 401 response, attempts a silent token refresh via /api/auth/refresh.
- * – If the refresh succeeds, retries the original request once.
- * – If the refresh fails, clears auth state and redirects to /login.
  */
 
 const api = axios.create({
@@ -19,7 +14,7 @@ const api = axios.create({
 
 /* ── Request interceptor ─────────────────── */
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem("accessToken");
 
   if (token) {
@@ -32,13 +27,13 @@ api.interceptors.request.use((config) => {
 /* ── Response interceptor (silent refresh) ── */
 
 let isRefreshing = false;
-let refreshSubscribers = [];
+let refreshSubscribers: ((token: string | null) => void)[] = [];
 
-function subscribeTokenRefresh(callback) {
+function subscribeTokenRefresh(callback: (token: string | null) => void) {
   refreshSubscribers.push(callback);
 }
 
-function onTokenRefreshed(newToken) {
+function onTokenRefreshed(newToken: string | null) {
   refreshSubscribers.forEach((cb) => cb(newToken));
   refreshSubscribers = [];
 }
@@ -50,8 +45,12 @@ function onRefreshFailed() {
 
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retried?: boolean };
+
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
 
     /* Only attempt refresh for 401 errors that haven't already been retried */
     if (error.response?.status !== 401 || originalRequest._retried) {

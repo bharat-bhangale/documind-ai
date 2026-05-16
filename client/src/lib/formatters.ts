@@ -1,9 +1,7 @@
 /**
  * Formats file size in bytes to a human-readable string.
- * @param {number} bytes
- * @returns {string}
  */
-export function formatFileSize(bytes) {
+export function formatFileSize(bytes: number): string {
   if (bytes === 0) return "0 B";
 
   const units = ["B", "KB", "MB", "GB"];
@@ -16,10 +14,8 @@ export function formatFileSize(bytes) {
 
 /**
  * Formats a date string or Date object to a localized string.
- * @param {string | Date} date
- * @returns {string}
  */
-export function formatDate(date) {
+export function formatDate(date: string | Date | undefined | null): string {
   if (!date) return "—";
 
   return new Date(date).toLocaleDateString("en-IN", {
@@ -31,10 +27,8 @@ export function formatDate(date) {
 
 /**
  * Formats a date string or Date to a relative "time ago" string.
- * @param {string | Date} date
- * @returns {string}
  */
-export function timeAgo(date) {
+export function timeAgo(date: string | Date | undefined | null): string {
   if (!date) return "";
 
   const now = Date.now();
@@ -51,10 +45,8 @@ export function timeAgo(date) {
 
 /**
  * Formats an amount in paise to INR currency string.
- * @param {number} paise
- * @returns {string}
  */
-export function formatCurrency(paise) {
+export function formatCurrency(paise: number): string {
   const rupees = paise / 100;
 
   return new Intl.NumberFormat("en-IN", {
@@ -67,11 +59,8 @@ export function formatCurrency(paise) {
 
 /**
  * Truncates a string to a max length and appends an ellipsis.
- * @param {string} str
- * @param {number} maxLength
- * @returns {string}
  */
-export function truncate(str, maxLength = 60) {
+export function truncate(str: string | undefined | null, maxLength = 60): string {
   if (!str || str.length <= maxLength) return str || "";
   return str.slice(0, maxLength) + "…";
 }

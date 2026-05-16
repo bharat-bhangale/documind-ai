@@ -14,6 +14,7 @@ import { Link, useParams } from "react-router-dom";
 import ChatPanel from "../components/ChatPanel";
 import api from "../lib/api";
 import { formatDate, formatFileSize } from "../lib/formatters";
+import type { Document } from "../types";
 
 /**
  * Document viewer page with summary generation, extracted text, and AI chat panel.
@@ -22,7 +23,7 @@ import { formatDate, formatFileSize } from "../lib/formatters";
 export default function DocumentViewer() {
   const { documentId } = useParams();
 
-  const [document, setDocument] = useState(null);
+  const [document, setDocument] = useState<Document | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [showChat, setShowChat] = useState(false);
@@ -30,13 +31,15 @@ export default function DocumentViewer() {
 
   /* ── Fetch document ────────────────────── */
   useEffect(() => {
+    if (!documentId) return;
+
     let cancelled = false;
 
     async function loadDocument() {
       try {
-        const { data } = await api.get(`/documents/${documentId}`);
+        const { data } = await api.get<{ data: { document: Document } }>(`/documents/${documentId}`);
         if (!cancelled) setDocument(data.data.document);
-      } catch (error) {
+      } catch (error: any) {
         if (!cancelled) {
           const message = error.response?.data?.message || "Document not found.";
           toast.error(message);
@@ -60,14 +63,17 @@ export default function DocumentViewer() {
     try {
       const { data } = await api.post(`/ai/documents/${documentId}/summary`);
 
-      setDocument((prev) => ({
-        ...prev,
-        summary: data.data.summary,
-        summaryGeneratedAt: data.data.summaryGeneratedAt || new Date().toISOString()
-      }));
+      setDocument((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          summary: data.data.summary,
+          summaryGeneratedAt: data.data.summaryGeneratedAt || new Date().toISOString()
+        };
+      });
 
       toast.success("Summary generated!");
-    } catch (error) {
+    } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Failed to generate summary."
       );
@@ -239,7 +245,7 @@ export default function DocumentViewer() {
             : "hidden lg:block"
         } lg:w-[420px] lg:shrink-0`}
       >
-        <ChatPanel documentId={documentId} />
+        {documentId && <ChatPanel documentId={documentId} />}
       </div>
     </main>
   );

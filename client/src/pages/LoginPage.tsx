@@ -17,7 +17,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
@@ -25,7 +25,7 @@ export default function LoginPage() {
     try {
       await login({ email, password });
       navigate("/dashboard", { replace: true });
-    } catch (err) {
+    } catch (err: any) {
       setError(
         err.response?.data?.message || "Login failed. Please try again."
       );

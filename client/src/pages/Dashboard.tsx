@@ -14,6 +14,7 @@ import UploadModal from "../components/UploadModal";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../lib/api";
 import { formatDate, formatFileSize, truncate } from "../lib/formatters";
+import type { Document } from "../types";
 
 /**
  * Dashboard page — lists user documents with search, upload, and delete.
@@ -21,11 +22,11 @@ import { formatDate, formatFileSize, truncate } from "../lib/formatters";
 export default function Dashboard() {
   const { user } = useAuth();
 
-  const [documents, setDocuments] = useState([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   /* ── Fetch documents ───────────────────── */
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function Dashboard() {
 
     async function loadDocuments() {
       try {
-        const { data } = await api.get("/documents");
+        const { data } = await api.get<{ data: { documents: Document[] } }>("/documents");
         if (!cancelled) setDocuments(data.data.documents || []);
       } catch {
         if (!cancelled) toast.error("Failed to load documents.");
@@ -50,7 +51,7 @@ export default function Dashboard() {
   }, []);
 
   /* ── Delete document ───────────────────── */
-  async function handleDelete(documentId, documentTitle) {
+  async function handleDelete(documentId: string, documentTitle: string) {
     if (!window.confirm(`Delete "${documentTitle}"? This cannot be undone.`)) {
       return;
     }
@@ -69,7 +70,7 @@ export default function Dashboard() {
   }
 
   /* ── Handle upload complete ────────────── */
-  function handleUploadComplete(newDocument) {
+  function handleUploadComplete(newDocument: Document) {
     setDocuments((prev) => [newDocument, ...prev]);
   }
 
@@ -190,7 +191,14 @@ export default function Dashboard() {
 
 /* ── Document Card ───────────────────────── */
 
-function DocumentCard({ document: doc, index, isDeleting, onDelete }) {
+interface DocumentCardProps {
+  document: Document;
+  index: number;
+  isDeleting: boolean;
+  onDelete: (id: string, title: string) => void;
+}
+
+function DocumentCard({ document: doc, index, isDeleting, onDelete }: DocumentCardProps) {
   return (
     <div
       className="glass-card animate-fade-in group relative flex flex-col p-5"
@@ -203,9 +211,13 @@ function DocumentCard({ document: doc, index, isDeleting, onDelete }) {
         </div>
 
         <button
-          onClick={() => onDelete(doc.id, doc.title)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onDelete(doc.id, doc.title);
+          }}
           disabled={isDeleting}
-          className="rounded-lg p-1.5 text-slate-600 opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
+          className="z-10 rounded-lg p-1.5 text-slate-600 opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100 focus:opacity-100"
           aria-label={`Delete ${doc.title}`}
           title="Delete document"
         >

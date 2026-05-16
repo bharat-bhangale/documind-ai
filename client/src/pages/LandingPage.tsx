@@ -273,8 +273,8 @@ export default function LandingPage() {
 }
 
 /* Helper to map gradient class names to approximate RGB for inline styles */
-function getGradientRgb(gradient) {
-  const colorMap = {
+function getGradientRgb(gradient: string) {
+  const colorMap: Record<string, string> = {
     "from-cyan-500 to-blue-600": "6, 182, 212",
     "from-violet-500 to-purple-600": "139, 92, 246",
     "from-amber-500 to-orange-600": "245, 158, 11",

@@ -1,29 +1,31 @@
 import { Loader2, Upload, X } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, DragEvent, ChangeEvent } from "react";
 import toast from "react-hot-toast";
 
 import api from "../lib/api";
 import { formatFileSize } from "../lib/formatters";
+import type { Document } from "../types";
 
 const MAX_FILE_SIZE_FREE = 5 * 1024 * 1024; // 5 MB
 const MAX_FILE_SIZE_PRO = 10 * 1024 * 1024; // 10 MB
 
+interface UploadModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onUploadComplete: (doc: Document) => void;
+  userPlan?: "free" | "pro";
+}
+
 /**
  * Upload modal with drag-and-drop support.
- *
- * @param {Object} props
- * @param {boolean} props.isOpen
- * @param {() => void} props.onClose
- * @param {(doc: object) => void} props.onUploadComplete - called with the new document after upload
- * @param {string} [props.userPlan="free"]
  */
-export default function UploadModal({ isOpen, onClose, onUploadComplete, userPlan = "free" }) {
-  const [file, setFile] = useState(null);
+export default function UploadModal({ isOpen, onClose, onUploadComplete, userPlan = "free" }: UploadModalProps) {
+  const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const maxSize = userPlan === "pro" ? MAX_FILE_SIZE_PRO : MAX_FILE_SIZE_FREE;
 
@@ -41,7 +43,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete, userPla
     onClose();
   }
 
-  function validateFile(selectedFile) {
+  function validateFile(selectedFile: File | undefined | null): selectedFile is File {
     if (!selectedFile) return false;
 
     if (selectedFile.type !== "application/pdf") {
@@ -57,7 +59,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete, userPla
     return true;
   }
 
-  function handleFileSelect(selectedFile) {
+  function handleFileSelect(selectedFile: File) {
     if (!validateFile(selectedFile)) return;
 
     setFile(selectedFile);
@@ -69,24 +71,24 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete, userPla
     }
   }
 
-  function handleInputChange(e) {
+  function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) handleFileSelect(selectedFile);
   }
 
-  function handleDragOver(e) {
+  function handleDragOver(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(true);
   }
 
-  function handleDragLeave(e) {
+  function handleDragLeave(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
   }
 
-  function handleDrop(e) {
+  function handleDrop(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
@@ -95,7 +97,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete, userPla
     if (droppedFile) handleFileSelect(droppedFile);
   }
 
-  async function handleUpload(e) {
+  async function handleUpload(e: React.FormEvent) {
     e.preventDefault();
 
     if (!file) {
@@ -116,7 +118,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete, userPla
     formData.append("title", title.trim());
 
     try {
-      const { data } = await api.post("/documents/upload", formData, {
+      const { data } = await api.post<{ data: { document: Document } }>("/documents/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         onUploadProgress: (progressEvent) => {
           const percent = Math.round(
@@ -130,7 +132,7 @@ export default function UploadModal({ isOpen, onClose, onUploadComplete, userPla
       resetForm();
       onUploadComplete(data.data.document);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       const message =
         error.response?.data?.message || "Upload failed. Please try again.";
       toast.error(message);

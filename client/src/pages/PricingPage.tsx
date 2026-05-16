@@ -39,9 +39,9 @@ const PRO_FEATURES = [
  * Loads the Razorpay checkout script dynamically.
  * Only loads once; subsequent calls return the cached script.
  */
-function loadRazorpayScript() {
+function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    if (window.Razorpay) {
+    if ((window as any).Razorpay) {
       resolve(true);
       return;
     }
@@ -96,7 +96,7 @@ export default function PricingPage() {
         prefill: checkout.prefill,
         theme: checkout.theme,
 
-        handler: async (response) => {
+        handler: async (response: any) => {
           /* 4. Verify payment on backend */
           try {
             await api.post("/payments/verify", {
@@ -121,9 +121,9 @@ export default function PricingPage() {
         }
       };
 
-      const razorpay = new window.Razorpay(options);
+      const razorpay = new (window as any).Razorpay(options);
       razorpay.open();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(
         error.response?.data?.message || error.message || "Payment failed."
       );

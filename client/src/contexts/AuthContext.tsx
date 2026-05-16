@@ -1,9 +1,20 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import toast from "react-hot-toast";
 
 import api from "../lib/api";
+import type { User } from "../types";
 
-const AuthContext = createContext(null);
+interface AuthContextValue {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  register: (data: Record<string, string>) => Promise<User>;
+  login: (data: Record<string, string>) => Promise<User>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<User | null>;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 /**
  * Custom hook to consume auth context.
@@ -26,8 +37,8 @@ export function useAuth() {
  * – register / login / logout actions
  * – initial session bootstrap via GET /auth/me
  */
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   /* ── Bootstrap: check existing session on mount ── */
@@ -66,7 +77,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* ── Register ─────────────────────────── */
-  const register = useCallback(async ({ name, email, password }) => {
+  const register = useCallback(async ({ name, email, password }: Record<string, string>) => {
     const { data } = await api.post("/auth/register", { name, email, password });
 
     localStorage.setItem("accessToken", data.data.accessToken);
@@ -77,7 +88,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* ── Login ────────────────────────────── */
-  const login = useCallback(async ({ email, password }) => {
+  const login = useCallback(async ({ email, password }: Record<string, string>) => {
     const { data } = await api.post("/auth/login", { email, password });
 
     localStorage.setItem("accessToken", data.data.accessToken);
