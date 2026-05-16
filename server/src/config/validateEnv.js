@@ -27,6 +27,8 @@ const envSchema = Joi.object({
   RAZORPAY_KEY_ID: Joi.string().min(3).required(),
   RAZORPAY_KEY_SECRET: Joi.string().min(3).required(),
   RAZORPAY_WEBHOOK_SECRET: Joi.string().allow("").optional(),
+  PRO_PLAN_PRICE_PAISE: Joi.number().integer().positive().default(29900),
+  PRO_PLAN_CURRENCY: Joi.string().length(3).uppercase().default("INR"),
 
   LOG_LEVEL: Joi.string().valid("error", "warn", "info", "http", "debug").default("info"),
   RATE_LIMIT_WINDOW_MS: Joi.number().integer().positive().default(900000),
@@ -73,6 +75,8 @@ export function validateEnv(rawEnv) {
     razorpayKeyId: value.RAZORPAY_KEY_ID,
     razorpayKeySecret: value.RAZORPAY_KEY_SECRET,
     razorpayWebhookSecret: value.RAZORPAY_WEBHOOK_SECRET,
+    proPlanPricePaise: value.PRO_PLAN_PRICE_PAISE,
+    proPlanCurrency: value.PRO_PLAN_CURRENCY,
     logLevel: value.LOG_LEVEL,
     rateLimitWindowMs: value.RATE_LIMIT_WINDOW_MS,
     rateLimitMax: value.RATE_LIMIT_MAX,

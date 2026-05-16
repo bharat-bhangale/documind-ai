@@ -255,14 +255,14 @@ Protected Route → Auth middleware verifies access token → Attach user to req
 
 **The 11-step payment flow:**
 1. User clicks "Upgrade to Pro" on pricing page
-2. Frontend calls `POST /api/payment/create-order` with amount
-3. Backend creates Razorpay order via SDK (amount in paise: 29900)
+2. Frontend calls `POST /api/payments/orders` without sending amount or currency
+3. Backend creates Razorpay order via SDK using the server-controlled amount in paise
 4. Backend saves order to MongoDB with status "created"
 5. Backend returns `order_id` to frontend
 6. Frontend opens Razorpay Checkout modal with `order_id`
 7. User enters card/UPI details and completes payment
 8. Razorpay returns `payment_id`, `order_id`, `signature` to frontend handler
-9. Frontend sends all three to `POST /api/payment/verify`
+9. Frontend sends all three to `POST /api/payments/verify`
 10. Backend generates expected signature using HMAC-SHA256 and compares
 11. If valid → update `user.plan = 'pro'` + save payment record
 

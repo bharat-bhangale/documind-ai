@@ -16,6 +16,9 @@ export const validEnv = {
   GOOGLE_CLIENT_ID: "test-google-client-id",
   RAZORPAY_KEY_ID: "test-razorpay-key-id",
   RAZORPAY_KEY_SECRET: "test-razorpay-key-secret",
+  RAZORPAY_WEBHOOK_SECRET: "test-razorpay-webhook-secret",
+  PRO_PLAN_PRICE_PAISE: "29900",
+  PRO_PLAN_CURRENCY: "INR",
   FREE_PLAN_MAX_DOCUMENTS: "3",
   FREE_PLAN_MAX_FILE_SIZE_BYTES: "2048",
   PRO_PLAN_MAX_FILE_SIZE_BYTES: "20000"

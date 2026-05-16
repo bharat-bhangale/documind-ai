@@ -411,3 +411,169 @@ Response:
   }
 }
 ```
+
+## Payments
+
+All non-webhook payment routes require `Authorization: Bearer <accessToken>`.
+
+Plan pricing is server-controlled:
+- Pro amount: `PRO_PLAN_PRICE_PAISE`.
+- Currency: `PRO_PLAN_CURRENCY`.
+- Client requests must not send or override payment amount, currency, or plan price.
+
+### POST `/api/payments/orders`
+
+Auth: Bearer access token
+
+Behavior:
+- Rejects users who are already on the Pro plan.
+- Creates a Razorpay order through the server-side SDK.
+- Stores a local `Payment` record with status `created`.
+- Returns Checkout options the frontend can pass to Razorpay Checkout.js.
+
+Response: `201`
+
+```json
+{
+  "success": true,
+  "data": {
+    "payment": {
+      "id": "payment_record_id",
+      "plan": "pro",
+      "provider": "razorpay",
+      "orderId": "order_razorpay_id",
+      "paymentId": null,
+      "amount": 29900,
+      "currency": "INR",
+      "status": "created",
+      "receipt": "dm_1710000000000_abc12345"
+    },
+    "checkout": {
+      "keyId": "rzp_test_key",
+      "orderId": "order_razorpay_id",
+      "amount": 29900,
+      "currency": "INR",
+      "name": "DocuMind Pro",
+      "description": "DocuMind Pro plan upgrade",
+      "prefill": {
+        "name": "Aditi Sharma",
+        "email": "aditi@example.com"
+      },
+      "theme": {
+        "color": "#2563eb"
+      }
+    }
+  }
+}
+```
+
+### POST `/api/payments/verify`
+
+Auth: Bearer access token
+
+Request:
+
+```json
+{
+  "razorpay_order_id": "order_razorpay_id",
+  "razorpay_payment_id": "pay_razorpay_id",
+  "razorpay_signature": "checkout_signature"
+}
+```
+
+Behavior:
+- Verifies the signature server-side with `RAZORPAY_KEY_SECRET`.
+- Requires the order to belong to the authenticated user.
+- Marks the payment as `paid`.
+- Upgrades the user plan to `pro`.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "payment": {
+      "id": "payment_record_id",
+      "orderId": "order_razorpay_id",
+      "paymentId": "pay_razorpay_id",
+      "amount": 29900,
+      "currency": "INR",
+      "status": "paid"
+    },
+    "userPlan": "pro",
+    "duplicate": false
+  }
+}
+```
+
+### POST `/api/payments/webhook`
+
+Auth: none
+
+Content type: `application/json`, parsed by `express.raw()`.
+
+Headers:
+- `X-Razorpay-Signature`: required.
+- `x-razorpay-event-id`: used for idempotency when present.
+
+Behavior:
+- Verifies the raw request body with `RAZORPAY_WEBHOOK_SECRET`.
+- Processes `payment.captured` by validating amount/currency and upgrading the user.
+- Processes `payment.failed` by marking the local payment failed without upgrading the user.
+- Ignores unknown events or unknown orders after signature verification.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "processed": true,
+    "duplicate": false,
+    "payment": {
+      "id": "payment_record_id",
+      "status": "paid"
+    }
+  }
+}
+```
+
+### GET `/api/payments/history`
+
+Auth: Bearer access token
+
+Query:
+- `page`: default `1`.
+- `limit`: default `10`, max `50`.
+
+Response:
+
+```json
+{
+  "success": true,
+  "data": {
+    "payments": [
+      {
+        "id": "payment_record_id",
+        "plan": "pro",
+        "provider": "razorpay",
+        "orderId": "order_razorpay_id",
+        "paymentId": "pay_razorpay_id",
+        "amount": 29900,
+        "currency": "INR",
+        "status": "paid",
+        "paidAt": "2026-05-15T00:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "total": 1,
+      "totalPages": 1
+    }
+  }
+}
+```
+
+History responses intentionally omit Checkout signatures, webhook event IDs, and raw gateway payloads.
